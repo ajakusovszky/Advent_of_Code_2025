@@ -3,11 +3,12 @@ https://adventofcode.com/2025/day/1
 Day 1: Secret Entrance
 """
 
-from handle_inputs import get_input_file
 from loguru import logger
 
+from .handle_inputs import get_input_file
 
-def part_one(file_path: str) -> int:
+
+def part_one(file_path: str = "inputs/day_1.txt") -> int:
     file_content = get_input_file(file_path).splitlines()
     position = 50  # Start position of the dial
     count_of_0 = 0
@@ -22,7 +23,7 @@ def part_one(file_path: str) -> int:
     return count_of_0
 
 
-def part_two(file_path: str) -> int:
+def part_two(file_path: str = "inputs/day_1.txt") -> int:
     file_content = get_input_file(file_path).splitlines()
     position = 50  # Start position of the dial
     count_of_0s = 0
