@@ -63,7 +63,7 @@ def load_module(module_name: str, directory: str = "codes"):
     return module
 
 
-def run_module_functions(module, function_prefix: str = ""):
+def run_module_functions(module, function_name: str = ""):
     """Run all public callables in the module."""
     functions = {
         name: obj
@@ -81,7 +81,7 @@ def run_module_functions(module, function_prefix: str = ""):
     logger.debug(f"Functions discovered: {list(functions.keys())}")
 
     for name, func in functions.items():
-        if name.startswith(function_prefix):
+        if function_name == "" or name == function_name:
             logger.debug(f"Running {module.__name__} {name}()...")
             try:
                 result = func()
@@ -96,7 +96,7 @@ def main():
     )
     parser.add_argument("module", help="Module name without .py")
     parser.add_argument(
-        "function_prefix", help="Function name prefix to filter", nargs="?", default=""
+        "function_name", help="Function name prefix to filter", nargs="?", default=""
     )
     parser.add_argument(
         "-v", action="count", default=0, help="Increase verbosity (-v, -vv, -vvv)"
@@ -111,8 +111,8 @@ def main():
 
     configure_logging(args.v)
     module = load_module(args.module)
-    function_prefix = args.function_prefix
-    run_module_functions(module, function_prefix)
+    function_name = args.function_name
+    run_module_functions(module, function_name)
 
 
 if __name__ == "__main__":
