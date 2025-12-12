@@ -1,0 +1,75 @@
+from loguru import logger
+
+from codes.day_5 import p1, p2
+
+
+def test_day_5_p1():
+    test_cases = [
+        ([], 0),
+        (
+            [
+                """
+                3-5
+                10-14
+                16-20
+                12-18
+
+                1
+                5
+                8
+                11
+                17
+                32
+                """
+            ],
+            3,
+        ),  # example from advent of code site
+    ]
+
+    for i, (input_data, expected) in enumerate(test_cases):
+        logger.debug(f"Running test case {i + 1} with input: {input_data}")
+        result = p1(lambda: input_data)
+        assert result == expected, (
+            f"Test case {i + 1} failed: expected {expected}, got {result}"
+        )
+        logger.info(f"Test case {i + 1} passed: expected {expected}, got {result}")
+
+
+def test_day_5_p2():
+    test_cases = [
+        ([], 0),
+        (
+            [
+                """
+                3-5
+                10-14
+                16-20
+                12-18
+
+                1
+                5
+                8
+                11
+                17
+                32
+                """
+            ],
+            14,
+        ),  # example from advent of code site
+    ]
+
+    for i, (input_data, expected) in enumerate(test_cases):
+        logger.debug(f"Running test case {i + 1} with input: {input_data}")
+        result = p2(lambda: input_data)
+        assert result == expected, (
+            f"Test case {i + 1} failed: expected {expected}, got {result}"
+        )
+        logger.info(f"Test case {i + 1} passed: expected {expected}, got {result}")
+
+
+if __name__ == "__main__":
+    test_day_5_p2()
+    # To test, run:
+    # uv run -m test.test_day_2
+    # or using -v, -vv for more verbosity:
+    # uv run runner.py test.test_day_2 -v
