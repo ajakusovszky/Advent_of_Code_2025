@@ -1,7 +1,9 @@
 """
-https://adventofcode.com/2025/day/1
-Day 1: Secret Entrance
+https://adventofcode.com/2025/day/2
+Day 2: Gift Shop
 """
+
+from functools import cache
 
 from loguru import logger
 
@@ -15,28 +17,50 @@ def _load_input() -> list[str]:
 
 
 def _get_parts(str_length: int) -> set[int]:
+    # Since the young Elf was just doing silly patterns, you can find the invalid IDs by looking for any ID which is made only of some sequence of digits repeated twice. So, 55 (5 twice), 6464 (64 twice), and 123123 (123 twice) would all be invalid IDs.
+    logger.trace(f"Finding parts for string length: {str_length}")
     parts = set()
-    for i in range(2, str_length):
+    if str_length % 2 == 0:
+        parts.add(str_length // 2)
+    return parts
+
+
+@cache
+def _get_parts_2(str_length: int) -> set[int]:
+    logger.trace(f"Finding parts for string length: {str_length}")
+    parts = set()
+    if str_length <= 1:
+        return parts
+    # find all divisors of str_length except str_length itself
+    for i in range(1, str_length):
+        logger.trace(
+            f"Checking divisor: {i} for length: {str_length}. Remainder: {str_length % i}"
+        )
         if str_length % i == 0:
             parts.add(i)
     return parts
 
 
-def _get_invalid_ids(id_ranges: list[str]) -> list[int]:
-    seen = set()
+def _get_invalid_ids(
+    id_ranges: list[str], _get_parts: callable = _get_parts
+) -> list[int]:
     invalid_ids = set()
 
     for id_range in id_ranges:
         start_str, end_str = id_range.split("-")
         start, end = int(start_str), int(end_str)
+        logger.trace(f"Processing range: {start} - {end}")
         previous_id_length = -1
         if start > end:
             logger.warning(f"Invalid range: {id_range}")
             continue
 
-        for id in range(start, end):
+        for id in range(start, end + 1):
             if previous_id_length != len(str(id)):
                 chunk_lengths = _get_parts(len(str(id)))
+                logger.trace(
+                    f"ID length changed: {len(str(id))}. New chunk lengths: {chunk_lengths}"
+                )
                 previous_id_length = len(str(id))
                 logger.debug(f"Checking ID: {id} with parts: {chunk_lengths}")
 
@@ -53,29 +77,17 @@ def _get_invalid_ids(id_ranges: list[str]) -> list[int]:
 
 def p1(fn_load_input=_load_input) -> int:
     file_content = fn_load_input()
+    if not file_content:
+        return 0
     id_ranges = file_content[0].split(",")
     invalid_ids = _get_invalid_ids(id_ranges)
-    return sum(invalid_ids) if len(invalid_ids) > 0 else 0
+    return sum(invalid_ids)
 
 
-def p1_test():
-    from codes.day_2 import p1
-
-    test_cases = [
-        ([], 0),
-        (
-            [
-                "11-22,95-115,998-1012,1188511880-1188511890,222220-222224,1698522-1698528,446443-446449,38593856-38593862,565653-565659,824824821-824824827,2121212118-2121212124"
-            ],
-            1227775554,
-        ),  # example from advent of code site
-    ]
-
-    for i, (input_data, expected) in enumerate(test_cases):
-        result = p1(lambda: input_data)
-        assert result == expected, (
-            f"Test case {i + 1} failed: expected {expected}, got {result}"
-        )
-        logger.info(
-            f"Test case {i + 1} ({input_data}) passed: expected {expected}, got {result}"
-        )
+def p2(fn_load_input=_load_input) -> int:
+    file_content = fn_load_input()
+    if not file_content:
+        return 0
+    id_ranges = file_content[0].split(",")
+    invalid_ids = _get_invalid_ids(id_ranges, _get_parts_2)
+    return sum(invalid_ids)

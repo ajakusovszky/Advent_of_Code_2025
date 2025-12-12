@@ -80,45 +80,10 @@ def p2(fn_load_input=_load_input) -> int:
     return count_of_0s
 
 
-def p2_test():
-    # run tests for p2 function, use -vv for more verbose output
-    test_cases = [
-        (["L0"], 0),
-        (["L50"], 1),
-        (["L150"], 2),
-        (["L50", "L0"], 1),
-        (["R200"], 2),
-        (["L250", "R150"], 4),  # 50-250=-200 →3, 0+150=150 →1, total 4
-        (["R350"], 4),  # 50+350=400 → 4
-        (["R450"], 5),  # 50+450=500 → 5
-        (["L450"], 5),  # 50-450=-400 → 5
-        (
-            ["R99", "L199", "R300"],
-            6,
-        ),  # 50+99=149 →1, 49-199=-150 →2, 50+300=350 →3, total 6
-        (
-            ["L99", "R199", "L300"],
-            6,
-        ),  # 50-99=-49 →1, 51+199=250 →2, 50-300=-250 →3, total 6
-        (
-            ["L68", "L30", "R48", "L5", "R60", "L55", "L1", "L99", "R14", "L82"],
-            6,
-        ),  # example from advent of code site
-    ]
-
-    for i, (input_data, expected) in enumerate(test_cases):
-        result = p2(lambda: input_data)
-        assert result == expected, (
-            f"Test case {i + 1} failed: expected {expected}, got {result}"
-        )
-        logger.info(
-            f"Test case {i + 1} ({input_data}) passed: expected {expected}, got {result}"
-        )
-
-
 if __name__ == "__main__":
     # logger.remove(0)
     # logger.add(sys.stderr, level="INFO")
 
-    logger.info(f"1.1: {p1()}")
-    logger.info(f"1.2: {p2()}")
+    # logger.info(f"1.1: {p1()}")
+    # logger.info(f"1.2: {p2()}")
+    pass

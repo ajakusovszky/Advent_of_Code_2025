@@ -6,7 +6,7 @@ import sys
 from loguru import logger
 
 
-def configure_logging(verbosity: int):
+def configure_logging(verbosity: int, path: str = None):
     # Remove default handler
     logger.remove()
 
@@ -22,6 +22,9 @@ def configure_logging(verbosity: int):
         logger.add(sys.stderr, level=level)
 
     logger.debug(f"Logging initialized at {level=}, {verbosity=}")
+    if path:
+        logger.add(path, level=level, rotation="10 MB")
+        logger.debug(f"Logging to file: {path}")
 
 
 def list_available_modules(directory: str = "codes"):
@@ -50,6 +53,9 @@ def show_available_modules(directory: str = "codes"):
 
 def load_module(module_name: str, directory: str = "codes"):
     """Dynamically load a Python module from a directory."""
+    # check if module name has a directory prefix
+    if "." in module_name:
+        directory, module_name = module_name.rsplit(".", 1)
     package_name = f"{directory}.{module_name}"
 
     try:
@@ -98,6 +104,7 @@ def main():
     parser.add_argument(
         "function_name", help="Function name prefix to filter", nargs="?", default=""
     )
+    parser.add_argument("-l", help="Log file path", default=None)
     parser.add_argument(
         "-v", action="count", default=0, help="Increase verbosity (-v, -vv, -vvv)"
     )
@@ -109,7 +116,7 @@ def main():
 
     args = parser.parse_args()
 
-    configure_logging(args.v)
+    configure_logging(args.v, args.l)
     module = load_module(args.module)
     function_name = args.function_name
     run_module_functions(module, function_name)

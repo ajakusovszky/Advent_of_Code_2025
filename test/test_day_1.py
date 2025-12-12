@@ -47,3 +47,9 @@ def test_day_1_p2_moves():
     for input_data, expected in test_cases:
         result = p2(lambda: input_data)
         assert result == expected
+
+
+if __name__ == "__main__":
+    test_day_1_p2_moves()
+    # To test, run:
+    # uv run -m test.test_day_1
