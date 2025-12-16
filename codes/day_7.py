@@ -3,6 +3,9 @@ https://adventofcode.com/2025/day/7
 Day 7: Laboratories
 """
 
+from copy import deepcopy
+from typing import Literal
+
 from loguru import logger
 
 from .handle_inputs import (
@@ -17,7 +20,12 @@ def _load_input() -> list[str]:
     return get_input_file(file_path).splitlines()
 
 
-def _get_line(prev_line: str, curr_line: str) -> (str, int):
+_DIRECTIONS = Literal["left", "right", "both"]
+
+
+def _get_line(
+    prev_line: str, curr_line: str, choice: _DIRECTIONS = "both"
+) -> tuple[str, int]:
     # tranforms the curr_line while looking for beams or S at prev_line.
     # also returns the number of splits
     if curr_line is None:
@@ -36,10 +44,14 @@ def _get_line(prev_line: str, curr_line: str) -> (str, int):
             continue
         if curr_line_list[i] == "^":
             # beam meets a splitter
-            if 0 <= i - 1 and result[i - 1] != "^":
+            if 0 <= i - 1 and result[i - 1] != "^" and choice in ["left", "both"]:
                 has_split = True
                 result[i - 1] = "|"
-            if i + 1 <= line_length and result[i + 1] != "^":
+            if (
+                i + 1 <= line_length
+                and result[i + 1] != "^"
+                and choice in ["right", "both"]
+            ):
                 has_split = True
                 result[i + 1] = "|"
             if has_split:
@@ -82,11 +94,46 @@ def _int_to_bool_list(num: int, length: int) -> list[bool]:
     return [bool(num & (1 << n)) for n in range(length)]
 
 
-def _generate_timeline(lines: list[str], seed: int) -> list[str]:
-    possible_choices = len(lines) // 2
+def _bool_list_to_int(bits: list[bool]) -> int:
+    value: int = 0
+    for b in bits:
+        value = (value << 1) | b
+    return value
+
+
+def _generate_timeline(lines_base: list[str], seed: int) -> list[str]:
+    possible_choices = len(lines_base) // 2
     choices = _int_to_bool_list(seed, possible_choices)
-    for i in lines:
-        ...
+    choices_pos = 0
+    total = 0
+    prev_line = None
+    # do not overwrite the base
+    lines_result = deepcopy(lines_base)
+    for line in lines_result:
+        # skip empty lines
+        if not line.strip():
+            continue
+        # at first line only
+        if not prev_line:
+            prev_line = line
+            continue
+        # extend the seed as needed with "left" direction as default
+        if choices_pos >= len(choices):
+            direction = "left"
+            choices.append(False)
+        else:
+            direction = "left" if not choices[choices_pos] else "right"
+
+        changed_line, split_count = _get_line(prev_line, line, direction)
+        logger.trace(f"line: {line} {changed_line} {split_count=} {direction=}")
+        if split_count > 0:
+            choices_pos += 1
+
+        line = changed_line
+        prev_line = line
+        total += split_count
+    logger.debug(f"Steps: {choices_pos} {_bool_list_to_int(choices)} {choices=}")
+    return lines_result
 
 
 def _find_next_timeline(lines: list[str], seed: int) -> int:
@@ -97,6 +144,7 @@ def _find_next_timeline(lines: list[str], seed: int) -> int:
     # possible_choices = len(lines) // 2
     # for i in range(total_length - 1, 0, -1):
     #     line = lines[i]
+    logger.trace(_generate_timeline(lines, seed))
 
 
 def p2(fn_load_input=_load_input) -> int:
@@ -106,6 +154,8 @@ def p2(fn_load_input=_load_input) -> int:
     if not file_content:
         return 0
     total = 0
+    seed = 0
+    new_seed = _find_next_timeline(seed)
 
     logger.debug(f"Total result: {total}")
 
